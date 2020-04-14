@@ -47,12 +47,19 @@ class Vue(tk.Tk):
     def cacher_vue_creer_joueur(self):
         self._vue_creer_joueur.pack_forget() 
     
-    def vue_entrainement(self, tirage, fn_callback):
+    def vue_entrainement(self, tirage, n, *fn_callback):
         """
         """
-        self._vue_entrainement = Entrainement(self, tirage, fn_callback)
+        self._vue_entrainement = Entrainement(self, tirage, n, fn_callback)
+        self._vue_entrainement.bouton_effectuer_operation(self._controller.effectuer_une_operation)
         self._vue_entrainement.pack()
-         
+        
+    def supp_vue_entrainement(self):
+        """
+            cette méthode supprime totalement la vue d'entrainement actif
+        """
+        self._vue_entrainement.destroy()
+        
     def definiton_proprietes_fenetre_principale(self):
         """
             Cette methode définit les propriétés de la fénêtre principale
@@ -70,7 +77,7 @@ class Vue(tk.Tk):
         POS_WIN = (pos_x, pos_y)                    #définition de la position initiale
         
         self.title(NOM_DU_JEU)
-        #self.iconbitmap(PATH_ICO)
+        self.iconbitmap(PATH_ICO)
         geo = "{}x{}+{}+{}".format(TAILLE_WIN[0], TAILLE_WIN[1], POS_WIN[0], POS_WIN[1])
         self.geometry(geo)
         self.resizable(width = False, height = False)
@@ -86,4 +93,4 @@ class Vue(tk.Tk):
     def mettre_a_jour_vue_des_plaques(self, plaques):
         """
         """
-        pass
+        self._vue_entrainement._section_2.mettre_à_jour_plques(self._controller._plaques_tirees, plaques)

@@ -18,7 +18,7 @@ class CreationJoueur(Frame):
     
     def champ_saisie(self):
         self._pseudo = StringVar()
-        _champ = Entry(self, font=("Helvetica", 10), textvariable=self._pseudo).grid(row=2, column=0)
+        Entry(self, font=("Helvetica", 10), textvariable=self._pseudo).grid(row=2, column=0)
     
     def bouton_creer(self, label, fn_callback):
         self._creer = Bouton(self, label, fn_callback).grid(row=4, column=0)
@@ -31,4 +31,4 @@ class CreationJoueur(Frame):
         _icon.grid(row=1, column=0)
     
     def label_champ(self):
-        _label_du_champ = Label(self, text="Veuillez saisir un pseudo s'il vous plaît :", font=("Helvetica", 10)).grid(row=0, column=0)
+        Label(self, text="Veuillez saisir un pseudo s'il vous plaît :", font=("Helvetica", 10)).grid(row=0, column=0)

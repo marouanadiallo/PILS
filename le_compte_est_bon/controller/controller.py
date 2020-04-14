@@ -12,6 +12,7 @@ class Controller:
     
     def __init__(self):
         self._vue = Vue(self)
+        self._indices = list()
     
     def cree_joueur(self, nom):
         """
@@ -37,13 +38,15 @@ class Controller:
         self._N = rn.randint(INTERVALLE_DE_N[0], INTERVALLE_DE_N[1])
         return self._N
     
-    def effectuer_une_operation(self, operande_1, operande_2, index_operateur):
+    def effectuer_une_operation(self):
         """
             Cette fonction est la fonction callback du button 'effectuer' après le choix des opérandes et l'opérateur
         """
-        resultat = self._joueur.effectuer_une_operation(operande_1, operande_2, index_operateur)
+        print(self._indices)
+        resultat = self._joueur.effectuer_une_operation(self._plaques_tirees[self._indices[0]], self._plaques_tirees[self._indices[1]], self._indices[2])
         if resultat != None:
-            self._plaques_tirees.remove(operande_1).remove(operande_2)
+            self._plaques_tirees.remove(self._plaques_tirees[self._indices[0]])
+            self._plaques_tirees.remove(self._plaques_tirees[self._indices[1]])
             self._plaques_tirees.append(resultat)
             
             self.a_gagner_ou_non(resultat)                          #on vérifie s'il a trouvé la valeur N
@@ -92,13 +95,34 @@ class Controller:
             self.lancer_une_alerte("Votre nom doit obligatoirement commencé par une lettre !")
         else:
             self._vue.cacher_vue_creer_joueur()
-            self._vue.vue_entrainement(self.tirage(), self.get_indice_bouton)
+            self._vue.vue_entrainement(self.tirage(), self.tirer_n_aleatoirement(), self.relance_nouvelle_partie, self.generer_solution, self.get_indice_bouton)
            
     def get_indice_bouton(self, arg):
         """
+            cette méthode est appelée à chaque fois qu'on choisit une plaque et récupère l'indice de la plaque en param
+            ensuite elle ajoute l'indice dans la liste des plaques choisie et désactive la plaque, elle active également le bouton effectuer une fois que la taille de la liste est 
+            égale à trois
         """
-        print(arg)
-           
+        self._indices.append(arg)
+        if len(self._indices) == 3:
+            self._vue._vue_entrainement._bouton_effectuer.fixer_des_options(state="normal")
+        else:
+            self._vue._vue_entrainement._section_2.desactive_bouton(arg)
+    
+    def relance_nouvelle_partie(self):
+        """
+        """
+        self._vue.supp_vue_entrainement()
+        self.activer_vue_entrainement(self._joueur._nom)
+        self._indices.clear()
+        print("relance jeu")
+    
+    def generer_solution(self):
+        """
+        """
+        print("générer une solution")
+    
+         
     def activer_vue_jeu_a_deux(self, value_champ):
         """
         """

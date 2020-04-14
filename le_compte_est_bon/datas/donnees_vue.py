@@ -1,7 +1,7 @@
 #encoding:utf-8
 
 LES_OPERATEURS = ("+","-","*","/")          #les opérateurs autorisé pour le jeu
-INTERVALLE_DE_N = (999, 1000)               #l'interval de tirage de la valeur de N
+INTERVALLE_DE_N = (100, 999)               #l'interval de tirage de la valeur de N
 NOM_DU_JEU = "LE COMPTE EST BON"
 PATH_ICO = "images/logo.ico"
 PATH_CONNEXION = "images/icon_connexion.png"
