@@ -31,6 +31,7 @@ class Controller:
         self._plaques_tirees = Plaque.tirage()
         return self._plaques_tirees
     
+    
     def tirer_n_aleatoirement(self):
         """
             tire et retourne une valeur aléatoirement entre [999 à 1000]
@@ -43,7 +44,7 @@ class Controller:
             Cette fonction est la fonction callback du button 'effectuer' après le choix des opérandes et l'opérateur
         """
         print(self._indices)
-        resultat = self._joueur.effectuer_une_operation(self._plaques_tirees[self._indices[0]], self._plaques_tirees[self._indices[1]], self._indices[2])
+        resultat = self._joueur.effectuer_une_operation(self._plaques_tirees[self._indices[0]], self._plaques_tirees[self._indices[1]], self._indices_op)
         if resultat != None:
             self._plaques_tirees.remove(self._plaques_tirees[self._indices[0]])
             self._plaques_tirees.remove(self._plaques_tirees[self._indices[1]])
@@ -95,19 +96,22 @@ class Controller:
             self.lancer_une_alerte("Votre nom doit obligatoirement commencé par une lettre !")
         else:
             self._vue.cacher_vue_creer_joueur()
-            self._vue.vue_entrainement(self.tirage(), self.tirer_n_aleatoirement(), self.relance_nouvelle_partie, self.generer_solution, self.get_indice_bouton)
-           
-    def get_indice_bouton(self, arg):
+            self._vue.vue_entrainement()
+    
+    def get_indice_operateur(self, arg):
+        """
+        """
+        self._indices_op = arg
+        
+    def get_indice_plaque(self, arg):
         """
             cette méthode est appelée à chaque fois qu'on choisit une plaque et récupère l'indice de la plaque en param
             ensuite elle ajoute l'indice dans la liste des plaques choisie et désactive la plaque, elle active également le bouton effectuer une fois que la taille de la liste est 
             égale à trois
         """
-        self._indices.append(arg)
-        if len(self._indices) == 3:
-            self._vue._vue_entrainement._bouton_effectuer.fixer_des_options(state="normal")
-        else:
-            self._vue._vue_entrainement._section_2.desactive_bouton(arg)
+       
+        if len(self._indices) != 2:
+            self._indices.append(arg)
     
     def relance_nouvelle_partie(self):
         """
