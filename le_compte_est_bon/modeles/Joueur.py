@@ -50,7 +50,12 @@ class Joueur:
             Supprime la dernière opération de la liste et restitue l'opération supprimée
         """
         return self._liste_operations.pop()
-
+    def get_dernier_operation(self):
+        """
+            retourne la dernière opération
+        """
+        return self._liste_operations[-1]
+        
     @property
     def score(self):
         """

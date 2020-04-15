@@ -67,7 +67,7 @@ class Vue(tk.Tk):
         screen_x =  self.winfo_screenwidth()
         screen_y =  self.winfo_screenheight()
 
-        TAILLE_WIN = (screen_x//2,screen_y//2)        #la fenêtre aura pour taille la moitié de l'écran de l'appareil d'exécution
+        TAILLE_WIN = (screen_x//2,screen_y//2+((screen_y//2)//4))        #la fenêtre aura pour taille la moitié de l'écran de l'appareil d'exécution
 
         #afin de centrer la fenêtre au lancement 
         pos_x = (screen_x // 2)-(TAILLE_WIN[0] //2)
@@ -87,9 +87,3 @@ class Vue(tk.Tk):
             Lance un messagebox info
         """
         messagebox.showinfo("Inforamtion", msg)
-
-    
-    def mettre_a_jour_vue_des_plaques(self, plaques):
-        """
-        """
-        pass

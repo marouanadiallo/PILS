@@ -12,8 +12,13 @@ class Controller:
     
     def __init__(self):
         self._vue = Vue(self)
+        
+        self._operandes = list()
         self._indices = list()
-    
+        
+        self._op_select = False
+        self._indices_op = None
+        
     def cree_joueur(self, nom):
         """
             Crée un joueur pour une partie
@@ -43,25 +48,32 @@ class Controller:
         """
             Cette fonction est la fonction callback du button 'effectuer' après le choix des opérandes et l'opérateur
         """
-        print(self._indices)
-        resultat = self._joueur.effectuer_une_operation(self._plaques_tirees[self._indices[0]], self._plaques_tirees[self._indices[1]], self._indices_op)
+        
+        resultat = self._joueur.effectuer_une_operation(self._operandes[0], self._operandes[1], self._indices_op)
         if resultat != None:
-            self._plaques_tirees.remove(self._plaques_tirees[self._indices[0]])
-            self._plaques_tirees.remove(self._plaques_tirees[self._indices[1]])
+            self._plaques_tirees.remove(self._operandes[0])
+            self._plaques_tirees.remove(self._operandes[1])
             self._plaques_tirees.append(resultat)
             
-            self.a_gagner_ou_non(resultat)                          #on vérifie s'il a trouvé la valeur N
-            self.mettre_a_jour_les_plaques(self._plaques_tirees)    #appelle de mise à jour de la vue
+            self._vue._vue_entrainement.mise_a_jour_des_plaque(self._indices)           #mettre à jour les plaques utilisable
+            self._vue._vue_entrainement.desactiver_bouton_effectuer()
+            
+            #affiche au console pour voire les opérations éffectuées
+            print(f"Les plaque choisie sont : {self._operandes} et l'indice de l'opérateur choisie {self._indices_op}")
+            print(f"Liste des plaques disponible après l'opération : {self._plaques_tirees}")
+            
+            self._vue._vue_entrainement.affiche_operation(self._joueur.get_dernier_operation(), self._indices_op)        #on affiche l'opération effectuée
+            self._operandes.clear()
+            self._indices.clear()
+            
+            self._op_select = False
+            
+            self.a_gagner_ou_non(resultat)                                              #on vérifie s'il a trouvé la valeur N
         else:
-            self.lancer_une_alerte("L'opération que vous souhaitez éffectuer est non permise!")
-    
-    def mettre_a_jour_les_plaques(self, plaques):
-        """
-            Cette méthode appelle la méthode mettre_a_jour_vue_des_plaques de la vue afin 
-            de mettre à jour après une opération effectuée
-        """
-        self._vue.mettre_a_jour_vue_des_plaques(plaques)
-    
+            self.lancer_une_alerte("L'opération que vous souhaitez éffectuer est non permise, changé d'opérateur ou cliqué sur C pour changer de plaques ! ")
+        
+        
+        
     def lancer_une_alerte(self, msg):
         """
             Demande à la vue de lancer une alerte en affichant le message msg
@@ -91,36 +103,61 @@ class Controller:
         """
             Cette méthode active la vue d'entrainement
         """
-        print("dans la vue d'entrainement,pseudo saisie : {}".format(value_champ))
         if self.cree_joueur(value_champ) == None:
             self.lancer_une_alerte("Votre nom doit obligatoirement commencé par une lettre !")
         else:
             self._vue.cacher_vue_creer_joueur()
             self._vue.vue_entrainement()
-    
+            print(f"Les plaques tirées sont : {self._plaques_tirees}")
+        
+        
     def get_indice_operateur(self, arg):
         """
         """
         self._indices_op = arg
+        if not self._op_select and len(self._indices) == 2:
+            self._vue._vue_entrainement.activer_bouton_effectuer(self._indices)
+            self._op_select = True
+        print(self._indices_op)
         
-    def get_indice_plaque(self, arg):
+    def get_value_plaque(self, arg):
         """
-            cette méthode est appelée à chaque fois qu'on choisit une plaque et récupère l'indice de la plaque en param
-            ensuite elle ajoute l'indice dans la liste des plaques choisie et désactive la plaque, elle active également le bouton effectuer une fois que la taille de la liste est 
-            égale à trois
         """
-       
-        if len(self._indices) != 2:
+        if len(self._indices) < 2:
             self._indices.append(arg)
+            self._vue._vue_entrainement._section_2.desactive_bouton(arg)
+            self._operandes.append(self._vue._vue_entrainement.get_value_btn(arg))  
+            if not self._op_select and len(self._indices) == 2:
+                self._vue._vue_entrainement.activer_bouton_effectuer(self._indices)
+        print(self._operandes)
     
     def relance_nouvelle_partie(self):
         """
         """
-        self._vue.supp_vue_entrainement()
-        self.activer_vue_entrainement(self._joueur._nom)
+        self._vue._vue_entrainement.update_btn_texts(self.tirage(), self.tirer_n_aleatoirement())
+        self._vue._vue_entrainement.activer_les_plaques()
+        
         self._indices.clear()
-        print("relance jeu")
+        self._operandes.clear()
+        self._op_select = False
+        
+        print(f"Les plaques tirées pour une nouvelle partie sont : {self._plaques_tirees}")
     
+    def supprimer_derniere_operation(self, listbox):
+        """
+        """            
+        listbox.delete('end')
+        op = self._joueur.supprime_derniere_operation()
+        self._plaques_tirees.remove(op[-1])
+        self._plaques_tirees.append(op[0])
+        self._plaques_tirees.append(op[1])
+        self._vue._vue_entrainement.activer_une_liste_de_plaque(op)
+        
+        les_element = listbox.get(0, 'end')
+        if len(les_element) ==0:
+            self._vue._vue_entrainement._section_3.desactive_btn_supp()
+        print(self._plaques_tirees)
+        
     def generer_solution(self):
         """
         """
@@ -135,7 +172,14 @@ class Controller:
             self.lancer_une_alerte("Votre nom doit obligatoirement commencé par une lettre !")
         else:
             self._vue.cacher_vue_creer_joueur()
-            
+    
+    def annuller_operation(self):
+        """
+        """
+        self._vue._vue_entrainement._section_2.annuller_op(self._plaques_tirees)
+        self._operandes.clear()
+        self._indices.clear()
+        
     def lancer_la_vue(self):
         """
             Lance la vue
