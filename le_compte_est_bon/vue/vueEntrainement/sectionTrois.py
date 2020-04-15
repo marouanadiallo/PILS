@@ -22,16 +22,16 @@ class SectionTrois(Frame):
         self._label = Label(self, text="Historique de vos opérations", font=("Helvetica", 10, "bold"), pady = 2)
         self._label.grid(row = 0, column = 0, padx = 130, pady=5)
         
-        self._label_s = Label(self, text="cliquez sur le bouton solution pour voir la resolution de cette partie !", font=("Helvetica", 10, "bold"), wraplength = 200, pady = 2)
+        self._label_s = Label(self, text="Cliquez sur le bouton solution pour voir la resolution de cette partie !", font=("Helvetica", 10, "bold"), wraplength = 200, pady = 2)
         self._label_s.grid(row = 0, column = 1, padx = 130, pady=5)
         
     def liste_box_(self):
         """
         """        
-        self._listebox_historique = Listbox(self, bd =2 , relief="groove", width=50)
+        self._listebox_historique = Listbox(self, bd =2 , relief="groove", width=50, font=("Helvetica", 10, "bold"))
         self._listebox_historique.grid(row = 1, column = 0, pady = 2)
         
-        self._listebox_solution = Listbox(self, bd =2 , relief="groove", state="disabled", width=50)
+        self._listebox_solution = Listbox(self, bd =2 , relief="groove", state="disabled", width=50, font=("Helvetica", 10, "bold"))
         self._listebox_solution.grid(row = 1, column=1, pady = 2)
     
     def btn_supp_derniere_opetation(self):
