@@ -1,5 +1,5 @@
 #encoding:utf-8
-from tkinter import Frame
+from tkinter import Frame, Menu
 from vue.Bouton import Bouton
 from vue.vueEntrainement.sectionUne import SectionUne
 from vue.vueEntrainement.sectionDeux import SectionDeux
@@ -27,6 +27,20 @@ class Entrainement(Frame):
         
         self.bouton_effectuer_operation()
         
+        #Ajout d'un menu 
+        menubar = Menu(master)
+        optionmenu = Menu(menubar, tearoff = 0)
+        optionmenu.add_command(label="score", command = self._controller.a_gagner_ou_non)
+        
+        optionmenu.add_separator()
+        optionmenu.add_command(label = "Quitter", command = master.quit)
+        menubar.add_cascade(label = "Options", menu = optionmenu)
+        
+        aproposmenu = Menu(menubar, tearoff=0)
+        aproposmenu.add_command(label = "Description", command = self.description_entrainement)
+        menubar.add_cascade(label = "A propos", menu = aproposmenu)
+        
+        master.config(menu = menubar)               #ajout du menu
     
     
     def bouton_effectuer_operation(self):
@@ -62,3 +76,9 @@ class Entrainement(Frame):
     
     def get_section_3(self):
         return self._section_3
+
+    
+    def description_entrainement(self):
+        """
+        """
+        pass

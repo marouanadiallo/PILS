@@ -28,10 +28,10 @@ class SectionTrois(Frame):
     def liste_box_(self):
         """
         """        
-        self._listebox_historique = Listbox(self, bd =2 , relief="groove", width=50, font=("Helvetica", 10, "bold"))
+        self._listebox_historique = Listbox(self, bd =2 , relief="groove", width=50, font=("Helvetica", 10, "bold"), activestyle ="none")
         self._listebox_historique.grid(row = 1, column = 0, pady = 2)
         
-        self._listebox_solution = Listbox(self, bd =2 , relief="groove", state="disabled", width=50, font=("Helvetica", 10, "bold"))
+        self._listebox_solution = Listbox(self, bd =2 , relief="groove", state="disabled", width=50, font=("Helvetica", 10, "bold"), activestyle ="none")
         self._listebox_solution.grid(row = 1, column=1, pady = 2)
     
     def btn_supp_derniere_opetation(self):
