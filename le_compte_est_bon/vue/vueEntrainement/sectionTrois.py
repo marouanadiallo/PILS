@@ -52,7 +52,7 @@ class SectionTrois(Frame):
         self._btn.fixer_des_options(state="disabled")
         
         
-    def affiche_operation(self, operation, indice_operateur):
+    def afficher_operation(self, operation, indice_operateur):
         """
             Affiche l'operation réçue en paramètre
         """

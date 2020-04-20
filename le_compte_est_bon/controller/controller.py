@@ -2,6 +2,7 @@
 import random as rn
 import re                                               #pour pouvoir utilser les expréssions régulière
 from vue.vue import Vue
+
 from modeles.Joueur import Joueur
 from modeles.Plaque import Plaque
 from datas.donnees_vue import INTERVALLE_DE_N
@@ -13,11 +14,13 @@ class Controller:
     def __init__(self):
         self._vue = Vue(self)
         
-        self._operandes = list()
-        self._indices = list()
+        self._operandes = list()        #stocke les opérandes choisies
+        self._indices = list()          #indice des opérandes choisies
         
-        self._op_select = False
-        self._indices_op = None
+        self._op_select = False         #opérateur est selectionée ou non
+        self._indice_op = None         #indice de l'opérateur choisie
+        
+        self._plaques_tirees  = self.tirage(6)
         
     def cree_joueur(self, nom):
         """
@@ -29,13 +32,17 @@ class Controller:
             self._joueur = Joueur(nom)
             return 1
         
-    def tirage(self):
+    def tirage(self, n):
         """
             Appelle la méthode de tirage des plaques de la classe plaque qui retourne une liste de 6 plaques
         """
-        self._plaques_tirees = Plaque.tirage()
-        return self._plaques_tirees
+        return Plaque.tirage(n)
     
+    def les_plaques_tirees(self):
+        """
+            Retourne la liste des plaques tirées au hasard
+        """
+        return self._plaques_tirees
     
     def tirer_n_aleatoirement(self):
         """
@@ -49,27 +56,25 @@ class Controller:
             Cette fonction est la fonction callback du button 'effectuer' après le choix des opérandes et l'opérateur
         """
         
-        resultat = self._joueur.effectuer_une_operation(self._operandes[0], self._operandes[1], self._indices_op)
+        resultat = self._joueur.effectuer_une_operation(self._operandes[0], self._operandes[1], self._indice_op)
         if resultat != None:
             self._plaques_tirees.remove(self._operandes[0])
             self._plaques_tirees.remove(self._operandes[1])
             self._plaques_tirees.append(resultat)
             
-            self._vue._vue_entrainement.mise_a_jour_des_plaque(self._indices)           #mettre à jour les plaques utilisable
+            self._vue._vue_entrainement.get_section_2().mettre_a_jour_apres_operation(resultat)              #mettre à jour les plaques utilisable
+            self._vue._vue_entrainement.get_section_2().activer_tous_sauf_la_liste(self._indices)
+            self._vue._vue_entrainement.get_section_3().afficher_operation(self._joueur.get_derniere_operation(), self._indice_op)
             self._vue._vue_entrainement.desactiver_bouton_effectuer()
             
-            #affiche au console pour voire les opérations éffectuées
-            print(f"Les plaque choisie sont : {self._operandes} et l'indice de l'opérateur choisie {self._indices_op}")
-            print(f"Liste des plaques disponible après l'opération : {self._plaques_tirees}")
-            
-            self._vue._vue_entrainement.affiche_operation(self._joueur.get_dernier_operation(), self._indices_op)        #on affiche l'opération effectuée
-            self._operandes.clear()
             self._indices.clear()
-            
+            self._operandes.clear()
             self._op_select = False
             
-            self.a_gagner_ou_non(resultat)                                              #on vérifie s'il a trouvé la valeur N
+            print(f"les plaques diponible après votre opération : {self._plaques_tirees}")
+            self.a_gagner_ou_non(resultat)                                                                  #on vérifie s'il a trouvé la valeur N
         else:
+            self.annuller_operation()
             self.lancer_une_alerte("L'opération que vous souhaitez éffectuer est non permise, changé d'opérateur ou cliqué sur C pour changer de plaques ! ")
         
         
@@ -114,50 +119,55 @@ class Controller:
     def get_indice_operateur(self, arg):
         """
         """
-        self._indices_op = arg
-        if not self._op_select and len(self._indices) == 2:
-            self._vue._vue_entrainement.activer_bouton_effectuer(self._indices)
-            self._op_select = True
-        print(self._indices_op)
+        self._indice_op = arg
+        self._op_select = True
+        if len(self._indices) == 2:
+            self._vue._vue_entrainement.activer_bouton_effectuer()
+            
         
-    def get_value_plaque(self, arg):
+    def get_valeur_et_indice_plaque(self, indice, valeur):
         """
         """
         if len(self._indices) < 2:
-            self._indices.append(arg)
-            self._vue._vue_entrainement._section_2.desactive_bouton(arg)
-            self._operandes.append(self._vue._vue_entrainement.get_value_btn(arg))  
-            if not self._op_select and len(self._indices) == 2:
-                self._vue._vue_entrainement.activer_bouton_effectuer(self._indices)
-        print(self._operandes)
+            self._indices.append(indice)
+            self._operandes.append(valeur)
+            
+            self._vue._vue_entrainement.get_section_2().desactiver_un_btn(indice)
+            if len(self._indices) == 2:
+                self._vue._vue_entrainement.get_section_2().desactiver_tous_les_btn()
+                if self._op_select:
+                    self._vue._vue_entrainement.activer_bouton_effectuer()
+                    print(f"Les opérandes sont : {self._operandes}")
+                    print(f"Les indices des opérandes choisie sont : {self._indices}")
+           
+                
+        
     
     def relance_nouvelle_partie(self):
         """
         """
-        self._vue._vue_entrainement.update_btn_texts(self.tirage(), self.tirer_n_aleatoirement())
-        self._vue._vue_entrainement.activer_les_plaques()
+        self._plaques_tirees = self.tirage(6)
+        self._vue._vue_entrainement.relance_nouvelle_partie(self.tirer_n_aleatoirement(), self._plaques_tirees)
         
         self._indices.clear()
         self._operandes.clear()
         self._op_select = False
-        
-        print(f"Les plaques tirées pour une nouvelle partie sont : {self._plaques_tirees}")
     
     def supprimer_derniere_operation(self, listbox):
         """
-        """            
+        """        
         listbox.delete('end')
         op = self._joueur.supprime_derniere_operation()
         self._plaques_tirees.remove(op[-1])
         self._plaques_tirees.append(op[0])
         self._plaques_tirees.append(op[1])
-        self._vue._vue_entrainement.activer_une_liste_de_plaque(op)
+        self._vue._vue_entrainement.get_section_2().mettre_a_jours_les_plaques(op[-1])
         
         les_element = listbox.get(0, 'end')
-        if len(les_element) ==0:
+        if len(les_element) == 0:
             self._vue._vue_entrainement._section_3.desactive_btn_supp()
         print(self._plaques_tirees)
-        
+      
     def generer_solution(self):
         """
         """
@@ -176,9 +186,12 @@ class Controller:
     def annuller_operation(self):
         """
         """
-        self._vue._vue_entrainement._section_2.annuller_op(self._plaques_tirees)
-        self._operandes.clear()
+        self._vue._vue_entrainement.get_section_2().annuller_derniere_operation()
+        self._vue._vue_entrainement.desactiver_bouton_effectuer()
+        
         self._indices.clear()
+        self._operandes.clear()
+        self._op_select = False
         
     def lancer_la_vue(self):
         """

@@ -30,6 +30,7 @@ class SectionUne(Frame):
     
     def update_label_n(self, n):
         """
+            Met à jour la nouvelle valeur à trouver 
         """
         self._n.set(n)
         

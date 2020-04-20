@@ -6,54 +6,27 @@ class SectionDeux(Frame):
     """
     """
     
-    def __init__(self, master, controller):
+    def __init__(self, master, controller, plaques):
         Frame.__init__(self, master)
         self._controller = controller
-        self._liste_plaques = list()
-        self._liste_operateurs = list()
+        
+        self._liste_btn_plaques = list()
+        self._liste_btn_operateurs = list()
         
         self._liste_textvar = list()
+        self._list_btn_desactive = list()
         
-        self._plaques_tirees = self._controller.tirage()
-        self.affiche_les_plaques(self._plaques_tirees)
+        self.affiche_les_plaques(plaques)
         self.affiche_les_operateurs()
     
-    
 
-    def get_value_textvariable(self, index):
-        """
-        """
-        return int(self._liste_textvar[index].get())
-    
-    def update_btn_texts(self, plaques):
-        """
-        """
-        self._plaques_tirees = plaques  #mettre à jour la liste des plaque
-        for i in range(0,len(plaques)):
-            self._liste_textvar[i].set(plaques[i])
-            
-        for i in range(len(plaques), len(self._liste_textvar)-1):
-            self._liste_textvar[i].set("_")
-            self.desactive_bouton(i)
-            
-    def update_nouvelle_plaque(self):
-        """
-            cette méthode affiche la valeur de la dernière opération sur le premier bouton de label _ trouvé et l'active également
-        """
-        for i in range(6, 11):
-            if self._liste_textvar[i].get() == "_":
-                self._liste_textvar[i].set(self._plaques_tirees[-1])
-                self.activer_une_plaque(i)
-                break
-        
-    
     def affiche_les_plaques(self, plaques):
         """
         """
         j = 0
         for i in range(0, len(plaques)*2):
             self._liste_textvar.append(StringVar())
-            _tmp = Button(self, textvariable = self._liste_textvar[i] , command=lambda indice = i :self._controller.get_value_plaque(indice))
+            _tmp = Button(self, textvariable = self._liste_textvar[i] , command=lambda indice = i:self._controller.get_valeur_et_indice_plaque(indice, int(self.get_valeur_btn(indice))))
             _tmp.config(font=("Helvetica", 15), padx=5, pady=2)
             if i < len(plaques): 
                 self._liste_textvar[i].set(plaques[i]) 
@@ -68,8 +41,89 @@ class SectionDeux(Frame):
                 _tmp.grid(row = 1, column = j, padx = 5, pady = 3)
                 j = j+1
             
-            self._liste_plaques.append(_tmp)
+            self._liste_btn_plaques.append(_tmp)
             
+    def get_valeur_btn(self, indice):
+        """
+            Renvoie la valeur associée au bouton de l'indice passé en paramètre
+        """ 
+        return self._liste_textvar[indice].get()
+           
+    def changer_les_plaques(self, plaques):
+        """
+            Cette méthode met à jour les plaques selon la liste des plaques passé en paramètre
+        """
+        self._list_btn_desactive.clear()
+        for i in range(0, len(plaques)):
+            self._liste_textvar[i].set(plaques[i])
+            if self._liste_btn_plaques[i]["state"] == "disabled":
+                self.activer_un_btn(i)
+                
+        for j in range(len(self._liste_textvar)//2, len(self._liste_textvar)-1):
+            self._liste_textvar[j].set("_")
+            self.desactiver_un_btn(j)
+        print("***************************************************************")
+        print(f"Nouvelle tirage : {plaques}")
+    
+    def mettre_a_jour_apres_operation(self, resultat):
+        """
+            Ajoute la plaque resultante d'une opération
+        """
+        for i in range(len(self._liste_textvar)//2, len(self._liste_textvar)-1):
+            if self.get_valeur_btn(i) == "_":
+                self._liste_textvar[i].set(resultat)
+                self.activer_un_btn(i)
+                break
+                
+    def annuller_derniere_operation(self):
+        """
+        """                   
+        for j in range(0, len(self._liste_btn_plaques)-1):
+            if j not in self._list_btn_desactive and self._liste_textvar[j].get() != "_":
+                self.activer_un_btn(j)
+                
+    def mettre_a_jours_les_plaques(self, resultat):
+        """
+            Active les plaques de la dernière opération supprimée
+        """
+        self.activer_un_btn(self._list_btn_desactive.pop())
+        self.activer_un_btn(self._list_btn_desactive.pop()) 
+        
+        for i in range(0, len(self._liste_textvar)-1):
+            if self._liste_textvar[i].get() !="_" and int(self._liste_textvar[i].get()) == resultat:
+                self._liste_textvar[i].set("_")
+                self.desactiver_un_btn(i)
+                
+    def desactiver_tous_les_btn(self):
+        """
+            cette méthode désactive tous les bouton sauf le bouton C (annulé les plaques choisie)
+        """
+        for i in range(0, len(self._liste_btn_plaques)-1):
+             if self._liste_btn_plaques[i]["state"] == "normal":
+                self.desactiver_un_btn(i)
+    
+    
+    def desactiver_un_btn(self, indice):
+        """
+            Désactive le bouton d'indice passé en param
+        """
+        self._liste_btn_plaques[indice].config(state="disabled")
+        
+    def activer_un_btn(self, indice):
+        """
+            Active le bouton d'indice passé en param
+        """
+        self._liste_btn_plaques[indice].config(state="normal")
+        
+    def activer_tous_sauf_la_liste(self, liste_indice):
+        """
+            Cette méthode active les plaques utilisable 
+        """
+        self._list_btn_desactive.extend(liste_indice)
+        for i in range(0, len(self._liste_btn_plaques)-1):
+            if i not in self._list_btn_desactive and self._liste_textvar[i].get() != "_":
+                self.activer_un_btn(i)
+                
     def affiche_les_operateurs(self):
         """
         """
@@ -77,61 +131,5 @@ class SectionDeux(Frame):
             _temp = Bouton(self, LES_OPERATEURS[i], lambda indice = i:self._controller.get_indice_operateur(indice))
             _temp.fixer_des_options(font=("Helvetica", 15), padx=5, pady=3)
             _temp.grid(row = 2, column = i+1, padx = 3, pady =3)
-            self._liste_operateurs.append(_temp)
+            self._liste_btn_operateurs.append(_temp)
     
-    def desactive_bouton(self, index):
-        """
-        """
-        self._liste_plaques[index].config(state="disable")
-        
-    def desactive_les_plaques(self, non_desactive):
-        """
-        """
-        for i in range(0,len(self._liste_plaques)-1):
-            if i not in non_desactive:
-                self.desactive_bouton(i)
-                
-    def desactive_une_liste_de_plaque(self, liste):
-        """
-            Cette méthode desactive la liste d'indice passé en paramètre
-        """
-        for i in range(0, len(liste)):
-            self.desactive_bouton(liste[i])
-                
-    def activer_une_plaque(self, index):
-        """
-        """
-        self._liste_plaques[index].config(state="normal")
-        
-    def activer_les_plaques_(self):
-        """
-            Cette méthode est appellée quand on souhaite relancé une nouvelle partie
-        """
-        for i in range(0,len(self._liste_plaques)-1):
-            if self._liste_textvar[i].get() != "_":
-                self.activer_une_plaque(i)
-                
-    def active_les_plaques_disponible(self):
-        """
-        """
-        for i in range(0,len(self._liste_plaques)-1):
-            if self._liste_textvar[i].get() != "_" and int(self._liste_textvar[i].get()) in self._plaques_tirees[0:len(self._plaques_tirees)-1]:
-                self.activer_une_plaque(i)
-                
-    def active_une_liste_de_plaque(self, liste):
-        """
-            Active une liste de paque donnée (opération supprimé)
-        """
-        for i in range(0,len(self._liste_plaques)-1):
-            if self._liste_textvar[i].get() != "_" and int(self._liste_textvar[i].get()) in [liste[0], liste[1]]:
-                self.activer_une_plaque(i)
-            elif self._liste_textvar[i].get() != "_" and int(self._liste_textvar[i].get()) == liste[-1]:
-                self._liste_textvar[i].set("_")
-                self.desactive_bouton(i)
-    
-    def annuller_op(self, liste):
-        """
-        """
-        for i in range(0,len(self._liste_plaques)-1):
-            if self._liste_textvar[i].get() != "_" and int(self._liste_textvar[i].get()) in liste:
-                self.activer_une_plaque(i)

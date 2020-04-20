@@ -14,7 +14,7 @@ class Entrainement(Frame):
         self._controller = controller
         
         #instanciation de la deuxième section
-        self._section_2 = SectionDeux(self, self._controller)
+        self._section_2 = SectionDeux(self, self._controller, self._controller.les_plaques_tirees())
         self._section_2.grid(row = 1, column = 0,  padx =5, pady = 5)
         
         #instanciation de la première section
@@ -40,51 +40,25 @@ class Entrainement(Frame):
         """
         """
         self._bouton_effectuer.fixer_des_options(state="disabled")
-        
-    def activer_bouton_effectuer(self, list_non_desactive):
-        """
-            Cette méthode active le bouton éffectuer une opération et desactive les autres plaques non sélectionnée
-        """
-        self._bouton_effectuer.config(state="normal")
-        self._section_2.desactive_les_plaques(list_non_desactive)
-        
-    def activer_les_plaques(self):
-        """
-            Cette méthode est appellée quand on souhaite relancé une nouvelle partie
-        """
-        self._section_2.activer_les_plaques_()
     
-    def mise_a_jour_des_plaque(self, liste):
+    def activer_bouton_effectuer(self):
         """
-            cette méthode est appellée à chaque oprération effectuée pour affiché la nouvelle plaque et désactivé les plaques utilisée
         """
-        self._section_2.active_les_plaques_disponible()
-        self._section_2.desactive_une_liste_de_plaque(liste)
-        self._section_2.update_nouvelle_plaque()
+        self._bouton_effectuer.fixer_des_options(state="normal")   
         
-        
-    def update_btn_texts(self, plaques, n):
+    def relance_nouvelle_partie(self, nouveau_n, nouvelle_liste):
         """
-            Cette méthode est appellée à chaque fois que le joueur souhaite refaire une nouvelle partie
-            dans ce cas on modifie le text des boutons par des les nouvelles plaques ainsi que la valeur n à trouver
         """
-        self._section_2.update_btn_texts(plaques)
-        self._section_1.update_label_n(n)
+        self._section_1.update_label_n(nouveau_n)                       #mettre la valeur à trouver à jour
+        self._section_2.changer_les_plaques(nouvelle_liste)             #met à jour les plaques
+        self._section_3.vider_historique()                              #efface l'historique
         self.desactiver_bouton_effectuer()
-        self._section_3.vider_historique()
+        
+    def get_section_2(self):
+        return self._section_2
     
-    def get_value_btn(self, indice):
-        """
-            retourn la valeur (textvariable) d'un bouton (plaque)
-        """
-        return self._section_2.get_value_textvariable(indice)
+    def get_section_1(self):
+        return self._section_1
     
-    def affiche_operation(self, operation, indice_operation):
-        """
-            Appelle la méthode affiche l'opération de la section 3
-        """
-        self._section_3.affiche_operation(operation, indice_operation)
-    def activer_une_liste_de_plaque(self, liste):
-        """
-        """
-        self._section_2.active_une_liste_de_plaque(liste)
+    def get_section_3(self):
+        return self._section_3
