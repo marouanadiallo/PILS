@@ -69,5 +69,9 @@ class Joueur:
             setter de la variable d'instance score
         """
         self._score += valeur
-        
-        
+    
+    @property
+    def nom(self):
+        """
+        """
+        return self._nom

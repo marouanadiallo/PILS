@@ -6,6 +6,13 @@ from vue.vue import Vue
 from modeles.Joueur import Joueur
 from modeles.Plaque import Plaque
 from datas.donnees_vue import INTERVALLE_DE_N
+from modeles.resolution_auto import resolution_automatique
+
+
+from modeles.operateurDivision import OperateurDivision
+from modeles.operateurFois import OperateurFois
+from modeles.operateurMoins import OperateurMoins
+from modeles.operateurPlus import OperateurPlus
 
 class Controller:
     """
@@ -91,11 +98,11 @@ class Controller:
             si oui on incrément son score d'un sinon il peut continuer
         """
         if resultat == self._N:
-            self.lancer_une_alerte("Félicitation vous avez trouvé !")
-            self._joueur.score(1)
+            self.lancer_une_alerte("Félicitation vous avez trouvé, cliquez sur ok pour une nouvelle partie !")
+            self.relance_nouvelle_partie()
     
     def activer_vue_creer_joueur(self, index):
-        """tirage, fnc_callback
+        """
             Cette méthode active la vue de creation d'un joueur
         """
         self._vue.cacher_vue_accueil()
@@ -103,6 +110,7 @@ class Controller:
             self._vue.vue_creer_joueur(self.activer_vue_entrainement)
         else:
             self._vue.vue_creer_joueur(self.activer_vue_jeu_a_deux)
+            
     
     def activer_vue_entrainement(self, value_champ):
         """
@@ -171,17 +179,39 @@ class Controller:
     def generer_solution(self):
         """
         """
-        print("générer une solution")
+        self._vue._vue_entrainement.get_section_3().vider_solution()
+        
+        _liste_plaque = [self._N] + self._plaques_tirees
+        _liste_operations = list()
+        min_difference = 1000
+        nombre_plus_proche = 0
+        max = 6
+        #construction de la chaine de responsabilité
+        _division = OperateurDivision(None)
+        _fois = OperateurFois(_division)
+        _moins = OperateurMoins(_fois)
+        _plus = OperateurPlus(_moins)
+        
+        if not resolution_automatique(_liste_plaque, max,  _plus, _liste_operations, min_difference, nombre_plus_proche) :
+           _liste_plaque.clear()
+           _liste_plaque = [nombre_plus_proche] + self._plaques_tirees
+           resolution_automatique(_liste_plaque, max,  _plus, _liste_operations, min_difference, nombre_plus_proche)
+            
+        for operation in _liste_operations:
+            self._vue._vue_entrainement.get_section_3()._listebox_solution.insert('end', operation)
+        
     
          
-    def activer_vue_jeu_a_deux(self, value_champ):
+    def activer_vue_jeu_a_deux(self, pseudo):
         """
         """
-        print("dans la vue jeu à deux, pseudo saisie : {}".format(value_champ))
-        if self.cree_joueur(value_champ) == None:
+        if self.cree_joueur(pseudo) == None:
             self.lancer_une_alerte("Votre nom doit obligatoirement commencé par une lettre !")
         else:
             self._vue.cacher_vue_creer_joueur()
+            print(self._joueur.nom)
+    
+    
     
     def annuller_operation(self):
         """

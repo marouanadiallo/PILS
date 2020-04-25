@@ -1,6 +1,7 @@
 #encoding:utf-8
 from tkinter import Frame, Label, StringVar
 from vue.Bouton import Bouton
+from datetime import time
 
 class SectionUne(Frame):
     """
@@ -9,10 +10,6 @@ class SectionUne(Frame):
     def __init__(self, master, controller):
         Frame.__init__(self,master)
         self._controller = controller
-        
-        self.nouvelle_partie()
-        self.valeur_N()
-        self.bouton_solution()
     
     def nouvelle_partie(self):
         """

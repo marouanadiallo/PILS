@@ -10,9 +10,9 @@ class OperateurDivision:
     
     def effectuer(self, operande_1, operande_2, index_operateur):
         if index_operateur == 3:
-            if operande_1 % operande_2 == 0:
+            if operande_2 != 0 and operande_1 % operande_2 == 0:
                 return operande_1 // operande_2
-            elif operande_2 % operande_1 == 0:
+            elif operande_1 != 0 and operande_2 % operande_1 == 0 :
                 return operande_2 // operande_1
             else:
                 return None

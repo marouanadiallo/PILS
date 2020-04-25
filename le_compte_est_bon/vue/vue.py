@@ -27,8 +27,8 @@ class Vue(tk.Tk):
         """
         self._vue_accueil = Accueil(self)
         self._vue_accueil.creation_bouton_entrainement("Entrainement", lambda:self._controller.activer_vue_creer_joueur(1))        #ajout du bouton entrainement
-        self._vue_accueil.creation_bouton_jeu_a_deux("Jeu à deux", lambda:self._controller.activer_vue_creer_joueur(2))            #ajout du bouton jeu à deux
-        self._vue_accueil.creation_bouton_quitter("Quitter", self.quit)                                                            #ajout du bouton quitté l'application
+        self._vue_accueil.creation_bouton_jeu_a_deux("Jeu à deux", lambda:self._controller.activer_vue_creer_joueur(2))                                                              #ajout du bouton jeu à deux
+        self._vue_accueil.creation_bouton_quitter("Quitter", self.quit)                                                          #ajout du bouton quitté l'application
     
         self._vue_accueil.pack(expand="yes") 
         
@@ -40,7 +40,7 @@ class Vue(tk.Tk):
             Cette méthode affiche la vue créer un joueur (en gros s'enrengistrer)
         """
         self._vue_creer_joueur = CreationJoueur(self)
-        self._vue_creer_joueur.bouton_creer("Créer", lambda:fn_callback(self._vue_creer_joueur._pseudo.get()))
+        self._vue_creer_joueur.bouton_creer("commencer une partie", lambda:fn_callback(self._vue_creer_joueur._pseudo.get()))
         
         self._vue_creer_joueur.pack(expand="yes")
     

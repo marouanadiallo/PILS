@@ -19,6 +19,9 @@ class Entrainement(Frame):
         
         #instanciation de la première section
         self._section_1 = SectionUne(self,self._controller)
+        self._section_1.nouvelle_partie()
+        self._section_1.valeur_N()
+        self._section_1.bouton_solution()
         self._section_1.grid(row = 0, column = 0, padx = 5, pady = 10)
         
         #instanciation de la section print solution
@@ -66,6 +69,7 @@ class Entrainement(Frame):
         self._section_1.update_label_n(nouveau_n)                       #mettre la valeur à trouver à jour
         self._section_2.changer_les_plaques(nouvelle_liste)             #met à jour les plaques
         self._section_3.vider_historique()                              #efface l'historique
+        self._section_3.vider_solution()
         self.desactiver_bouton_effectuer()
         
     def get_section_2(self):
