@@ -37,11 +37,13 @@ class Entrainement(Frame):
         
         optionmenu.add_separator()
         optionmenu.add_command(label = "Quitter", command = master.quit)
+        optionmenu.add_command(label="Retour accueil", command = self._controller.retourner_accueil)
         menubar.add_cascade(label = "Options", menu = optionmenu)
         
         aproposmenu = Menu(menubar, tearoff=0)
         aproposmenu.add_command(label = "Description", command = self.description_entrainement)
         menubar.add_cascade(label = "A propos", menu = aproposmenu)
+
         
         master.config(menu = menubar)               #ajout du menu
     

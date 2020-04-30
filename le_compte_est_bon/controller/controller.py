@@ -222,7 +222,13 @@ class Controller:
         self._indices.clear()
         self._operandes.clear()
         self._op_select = False
-        
+
+    def retourner_accueil(self):
+        self.relance_nouvelle_partie()
+        self._vue.supp_vue_entrainement()
+        #On crée la vue accueil
+        self._vue.vue_accueil()
+  
     def lancer_la_vue(self):
         """
             Lance la vue
