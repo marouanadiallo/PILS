@@ -20,7 +20,7 @@ class Entrainement(Frame):
         #instanciation de la première section
         self._section_1 = SectionUne(self,self._controller)
         self._section_1.nouvelle_partie()
-        self._section_1.valeur_N()
+        self._section_1.valeur_N(self._controller.tirer_n_aleatoirement())
         self._section_1.bouton_solution()
         self._section_1.grid(row = 0, column = 0, padx = 5, pady = 10)
         

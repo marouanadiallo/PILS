@@ -7,7 +7,7 @@ from modeles.Joueur import Joueur
 from modeles.Plaque import Plaque
 from datas.donnees_vue import INTERVALLE_DE_N
 from modeles.resolution_auto import resolution_automatique
-
+from modeles.moduleAgent import *
 
 from modeles.operateurDivision import OperateurDivision
 from modeles.operateurFois import OperateurFois
@@ -109,7 +109,7 @@ class Controller:
         if index == 1:
             self._vue.vue_creer_joueur(self.activer_vue_entrainement)
         else:
-            self._vue.vue_creer_joueur(self.activer_vue_jeu_a_deux)
+            self._vue.vue_creer_joueur(self.creer_agent_jeu_a_deux)
             
     
     def activer_vue_entrainement(self, value_champ):
@@ -202,16 +202,35 @@ class Controller:
         
     
          
-    def activer_vue_jeu_a_deux(self, pseudo):
+    def creer_agent_jeu_a_deux(self, pseudo):
         """
         """
         if self.cree_joueur(pseudo) == None:
             self.lancer_une_alerte("Votre nom doit obligatoirement commencé par une lettre !")
         else:
+            creat_agent(pseudo)     #creation d'agent
             self._vue.cacher_vue_creer_joueur()
-            print(self._joueur.nom)
-    
-    
+        
+            if nbAgent == 1:
+                self._vue.vue_jeu_a_deux(msg_sur_bus())
+            else:
+               self._vue.definir_temps()
+            
+            
+    def definir_temps(self, temps):
+        try:
+            v = temps
+            sendMsg(v)
+            self._vue.supp_vue_jeu_a_deux()
+            self._vue.vue_jeu_a_deux(msg_sur_bus())
+        except:
+            self.lancer_une_alerte("Donnez un nombre SVP !")
+         
+        
+    def stop_compte_a_bours(self):
+        """
+        """
+        pass
     
     def annuller_operation(self):
         """

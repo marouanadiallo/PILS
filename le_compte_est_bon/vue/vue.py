@@ -3,7 +3,9 @@ import tkinter as tk
 from tkinter import messagebox
 from vue.Accueil import Accueil
 from vue.CreationJoueur import CreationJoueur
+from vue.temps import DefinirTemps
 from vue.Entrainement import Entrainement
+from vue.JeuADeux import JeuADeux
 from datas.donnees_vue import NOM_DU_JEU, PATH_ICO
 
 
@@ -45,8 +47,18 @@ class Vue(tk.Tk):
         self._vue_creer_joueur.pack(expand="yes")
     
     def cacher_vue_creer_joueur(self):
-        self._vue_creer_joueur.pack_forget() 
-    
+        self._vue_creer_joueur.destroy() 
+        
+    def definir_temps(self):
+        self._temps = DefinirTemps(self)
+        self._temps.label_champ()
+        self._temps.champ_saisie()
+        self._temps.bouton_definir("Définir", lambda:self._controller.definir_temps(self._temps.get_temps()))
+        self._temps.pack(expand="yes")
+        
+    def supp_definir_temps(self):
+        self._temps.destructeur()
+        
     def vue_entrainement(self):
         """
         """
@@ -58,6 +70,17 @@ class Vue(tk.Tk):
             cette méthode supprime totalement la vue d'entrainement actif
         """
         self._vue_entrainement.destroy()
+    
+    def vue_jeu_a_deux(self, temps):
+        """
+        """
+        self._vue_jeu_a_deux = JeuADeux(self, self._controller, temps)
+        self._vue_jeu_a_deux.pack()
+    
+    def supp_vue_jeu_a_deux(self):
+        """
+        """
+        self._vue_jeu_a_deux.destroy()
         
     def definiton_proprietes_fenetre_principale(self):
         """
