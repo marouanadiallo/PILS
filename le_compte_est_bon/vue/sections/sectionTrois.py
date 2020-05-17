@@ -1,6 +1,6 @@
 #encoding:utf-8
 
-from tkinter import Frame, Listbox, Label, Scrollbar
+from tkinter import Frame, Listbox, Label, Scrollbar, StringVar
 from vue.Bouton import Bouton
 from datas.donnees_vue import LES_OPERATEURS
 
@@ -13,9 +13,10 @@ class SectionTrois(Frame):
         self._controller = controller
         
         self.labels_()
-        self.liste_box_()
+        self.liste_box_historique()
+        self.liste_box_solution()
         self.btn_supp_derniere_opetation()
-    
+        
     def labels_(self):
         """
         """
@@ -25,15 +26,17 @@ class SectionTrois(Frame):
         self._label_s = Label(self, text="Cliquez sur le bouton solution pour voir la resolution de cette partie !", font=("Helvetica", 10, "bold"), wraplength = 200, pady = 2)
         self._label_s.grid(row = 0, column = 1, padx = 130, pady=5)
         
-    def liste_box_(self):
+    def liste_box_historique(self):
         """
         """        
         self._listebox_historique = Listbox(self, bd =2 , relief="groove", width=50, font=("Helvetica", 10, "bold"), activestyle ="none")
         self._listebox_historique.grid(row = 1, column = 0, pady = 2)
         
+       
+    def liste_box_solution(self):
         self._listebox_solution = Listbox(self, bd =2 , relief="groove", width=50, font=("Helvetica", 10, "bold"), activestyle ="none")
         self._listebox_solution.grid(row = 1, column=1, pady = 2)
-    
+        
     def btn_supp_derniere_opetation(self):
         """
         """
@@ -71,8 +74,8 @@ class SectionTrois(Frame):
                 self._listebox_historique.insert('end', [operation[1], LES_OPERATEURS[3], operation[0], "=", operation[2]])
         else:
             self._listebox_historique.insert('end', [operation[0], LES_OPERATEURS[indice_operateur], operation[1], "=", operation[2]])
-    
-    
+            
+   
     def vider_historique(self):
         """
         """
@@ -82,3 +85,4 @@ class SectionTrois(Frame):
         """
         """
         self._listebox_solution.delete(0, 'end')
+        

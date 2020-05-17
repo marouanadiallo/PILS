@@ -41,24 +41,26 @@ class SectionUne(Frame):
     def bouton_stop(self):
         """
         """
-        _btn = Bouton(self, "Stop", self._controller.stop_compte_a_bours)
-        _btn.fixer_des_options(font=("Helvetica", 20), padx=5, pady=5, borderwidth=2, background="#273746", fg="white", activebackground="#273746", activeforeground="white")
-        _btn.grid(row = 0, column = 3, padx = 5, pady = 5)
+        self._btn = Bouton(self, "Stop", self._controller.stop_compte_a_rebours)
+        self._btn.fixer_des_options(font=("Helvetica", 20), padx=5, pady=5, borderwidth=2, background="#273746", fg="white", activebackground="#273746", activeforeground="white")
+        self._btn.grid(row = 0, column = 3, padx = 5, pady = 5)
     
+    def desactiver_btn_stop(self):
+        self._btn.fixer_des_options(state="disable")
+        
     def label_compte_a_rebours(self, temps=45):
         """
         """
         self._label_compte = Label(self, text="45 secondes")
         self._label_compte.config(font=("Helvetica", 10), padx=2, pady=5)
         self._label_compte .grid(row = 0, column = 0, padx = 5, pady = 5)
+        self._id = None
+        self._label_compte.after(1000, lambda:self._controller.compte_a_rebours(self._label_compte, temps, self._id))
         
-        self._label_compte.after(1000, lambda:self.compte_a_rebours(temps, None))
+    
+    def stop_compte_a_rebours(self):
+        self._label_compte.after_cancel(self._id)
         
-    def compte_a_rebours(self, temps = 45, id = None):
-        """
-        """
-        self._label_compte.config(text = "%d secondes" %temps)
-        if temps > 0:
-            id = self._label_compte.after(1000, lambda:self.compte_a_rebours(temps - 1, id))
-        else:
-            return None
+    @property
+    def get_temps(self):
+        return self._temps

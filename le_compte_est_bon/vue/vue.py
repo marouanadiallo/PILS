@@ -4,8 +4,7 @@ from tkinter import messagebox
 from vue.Accueil import Accueil
 from vue.CreationJoueur import CreationJoueur
 from vue.temps import DefinirTemps
-from vue.Entrainement import Entrainement
-from vue.JeuADeux import JeuADeux
+from vue.VueManager import VueManager
 from datas.donnees_vue import NOM_DU_JEU, PATH_ICO
 
 
@@ -20,8 +19,12 @@ class Vue(tk.Tk):
         
         self.definiton_proprietes_fenetre_principale()      #Appelle définition des proprietés de la fenetre principale
         self.vue_accueil()                                  #Appelle de la vue d'accueil
+        self._vue_manager = VueManager(self, self._controller)
+        self._vue_creer_joueur = CreationJoueur(self)
         
-    
+    @property
+    def vue_manager(self):
+        return self._vue_manager
     
     def vue_accueil(self):
         """
@@ -37,18 +40,16 @@ class Vue(tk.Tk):
     def cacher_vue_accueil(self):
         self._vue_accueil.pack_forget()
         
-    def vue_creer_joueur(self, fn_callback):
-        """
-            Cette méthode affiche la vue créer un joueur (en gros s'enrengistrer)
-        """
-        self._vue_creer_joueur = CreationJoueur(self)
-        self._vue_creer_joueur.bouton_creer("commencer une partie", lambda:fn_callback(self._vue_creer_joueur._pseudo.get()))
-        
-        self._vue_creer_joueur.pack(expand="yes")
+    def activer_vue_accueil(self):
+        self._vue_accueil.pack(expand="yes")    
     
     def cacher_vue_creer_joueur(self):
-        self._vue_creer_joueur.destroy() 
+        self._vue_creer_joueur.pack_forget() 
         
+    def activer_vue_creer_joueur(self, fn_callback):
+        self._vue_creer_joueur.bouton_creer("commencer une partie", lambda:fn_callback(self._vue_creer_joueur._pseudo.get()))
+        self._vue_creer_joueur.pack(expand="yes")
+          
     def definir_temps(self):
         self._temps = DefinirTemps(self)
         self._temps.label_champ()
@@ -59,28 +60,14 @@ class Vue(tk.Tk):
     def supp_definir_temps(self):
         self._temps.destructeur()
         
-    def vue_entrainement(self):
-        """
-        """
-        self._vue_entrainement = Entrainement(self, self._controller)
-        self._vue_entrainement.pack()
         
-    def supp_vue_entrainement(self):
-        """
-            cette méthode supprime totalement la vue d'entrainement actif
-        """
-        self._vue_entrainement.destroy()
-    
-    def vue_jeu_a_deux(self, temps):
-        """
-        """
-        self._vue_jeu_a_deux = JeuADeux(self, self._controller, temps)
-        self._vue_jeu_a_deux.pack()
-    
-    def supp_vue_jeu_a_deux(self):
-        """
-        """
-        self._vue_jeu_a_deux.destroy()
+    def activer_vue_manager(self):
+        self.vue_manager.pack() 
+           
+    def supprimer_vue_manager(self):
+        self.vue_manager.pack_forget()
+        
+
         
     def definiton_proprietes_fenetre_principale(self):
         """

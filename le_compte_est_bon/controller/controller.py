@@ -7,12 +7,13 @@ from modeles.Joueur import Joueur
 from modeles.Plaque import Plaque
 from datas.donnees_vue import INTERVALLE_DE_N
 from modeles.resolution_auto import resolution_automatique
-from modeles.moduleAgent import *
 
 from modeles.operateurDivision import OperateurDivision
 from modeles.operateurFois import OperateurFois
 from modeles.operateurMoins import OperateurMoins
 from modeles.operateurPlus import OperateurPlus
+
+from ivy.std_api import *
 
 class Controller:
     """
@@ -69,10 +70,10 @@ class Controller:
             self._plaques_tirees.remove(self._operandes[1])
             self._plaques_tirees.append(resultat)
             
-            self._vue._vue_entrainement.get_section_2().mettre_a_jour_apres_operation(resultat)              #mettre à jour les plaques utilisable
-            self._vue._vue_entrainement.get_section_2().activer_tous_sauf_la_liste(self._indices)
-            self._vue._vue_entrainement.get_section_3().afficher_operation(self._joueur.get_derniere_operation(), self._indice_op)
-            self._vue._vue_entrainement.desactiver_bouton_effectuer()
+            self._vue.vue_manager.section_2.mettre_a_jour_apres_operation(resultat)              #mettre à jour les plaques utilisable
+            self._vue.vue_manager.section_2.activer_tous_sauf_la_liste(self._indices)
+            self._vue.vue_manager.section_3.afficher_operation(self._joueur.get_derniere_operation(), self._indice_op)
+            self._vue.vue_manager.desactiver_bouton_effectuer()
             
             self._indices.clear()
             self._operandes.clear()
@@ -107,9 +108,9 @@ class Controller:
         """
         self._vue.cacher_vue_accueil()
         if index == 1:
-            self._vue.vue_creer_joueur(self.activer_vue_entrainement)
+            self._vue.activer_vue_creer_joueur(self.activer_vue_entrainement)
         else:
-            self._vue.vue_creer_joueur(self.creer_agent_jeu_a_deux)
+            self._vue.activer_vue_creer_joueur(self.creer_agent_jeu_a_deux)
             
     
     def activer_vue_entrainement(self, value_champ):
@@ -120,7 +121,8 @@ class Controller:
             self.lancer_une_alerte("Votre nom doit obligatoirement commencé par une lettre !")
         else:
             self._vue.cacher_vue_creer_joueur()
-            self._vue.vue_entrainement()
+            self._vue.vue_manager.activer_vue_entrainement()
+            self._vue.activer_vue_manager()
             print(f"Les plaques tirées sont : {self._plaques_tirees}")
         
         
@@ -130,7 +132,7 @@ class Controller:
         self._indice_op = arg
         self._op_select = True
         if len(self._indices) == 2:
-            self._vue._vue_entrainement.activer_bouton_effectuer()
+            self._vue.vue_manager.activer_bouton_effectuer()
             
         
     def get_valeur_et_indice_plaque(self, indice, valeur):
@@ -140,11 +142,11 @@ class Controller:
             self._indices.append(indice)
             self._operandes.append(valeur)
             
-            self._vue._vue_entrainement.get_section_2().desactiver_un_btn(indice)
+            self._vue.vue_manager.section_2.desactiver_un_btn(indice)
             if len(self._indices) == 2:
-                self._vue._vue_entrainement.get_section_2().desactiver_tous_les_btn()
+                self._vue.vue_manager.section_2.desactiver_tous_les_btn()
                 if self._op_select:
-                    self._vue._vue_entrainement.activer_bouton_effectuer()
+                    self._vue.vue_manager.activer_bouton_effectuer()
                     print(f"Les opérandes sont : {self._operandes}")
                     print(f"Les indices des opérandes choisie sont : {self._indices}")
            
@@ -155,7 +157,7 @@ class Controller:
         """
         """
         self._plaques_tirees = self.tirage(6)
-        self._vue._vue_entrainement.relance_nouvelle_partie(self.tirer_n_aleatoirement(), self._plaques_tirees)
+        self._vue.vue_manager.relance_nouvelle_partie(self.tirer_n_aleatoirement(), self._plaques_tirees)
         
         self._indices.clear()
         self._operandes.clear()
@@ -169,17 +171,17 @@ class Controller:
         self._plaques_tirees.remove(op[-1])
         self._plaques_tirees.append(op[0])
         self._plaques_tirees.append(op[1])
-        self._vue._vue_entrainement.get_section_2().mettre_a_jours_les_plaques(op[-1])
+        self._vue.vue_manager.section_2.mettre_a_jours_les_plaques(op[-1])
         
         les_element = listbox.get(0, 'end')
         if len(les_element) == 0:
-            self._vue._vue_entrainement._section_3.desactive_btn_supp()
+            self._vue.vue_manager.section_3.desactive_btn_supp()
         print(self._plaques_tirees)
       
     def generer_solution(self):
         """
         """
-        self._vue._vue_entrainement.get_section_3().vider_solution()
+        self._vue.vue_manager.section_3.vider_solution()
         
         _liste_plaque = [self._N] + self._plaques_tirees
         _liste_operations = list()
@@ -198,55 +200,125 @@ class Controller:
            resolution_automatique(_liste_plaque, max,  _plus, _liste_operations, min_difference, nombre_plus_proche)
             
         for operation in _liste_operations:
-            self._vue._vue_entrainement.get_section_3()._listebox_solution.insert('end', operation)
-        
+            self._vue.vue_manager.section_3._listebox_solution.insert('end', operation)
+            
+    ###################################################################################################################      
+        """
+            IVY
+        """
+    ###################################################################################################################
     
+            
+    def definir_temps(self, temps):
+        try:
+            self._temps = int(temps)
+            self._N = self.tirer_n_aleatoirement()
+            self._vue.supp_definir_temps()
+            self._vue.activer_vue_manager()
+            self._vue.vue_manager.veuillez_patienter()
+        except:
+            self.lancer_une_alerte("Donnez un nombre SVP !")
          
+    def on_die(self, *arg):
+        print(f"L'ordre de terminaison de l'agent {arg[0]} de l'identifiant {str(arg[1])}")
+        IvyStop()
+
+    def get_msg(self, *args):
+        
+        print(f"{args[0]} a envoyé {str(args[1])}, taille : {len(args[1])}")
+        self._vue.activer_vue_manager()
+        
+        if args[1] == "trouver":
+            self._vue.vue_manager.afficher_aprs_stop()
+            self._vue.vue_manager.section_1.desactiver_btn_stop()
+        else:
+            lis = args[1].replace("]", "").replace("[", "").split(",")
+            
+            if(len(lis) == 2 and lis[0] != "nb:"):
+                self._N = int(lis[1])
+                self._vue.vue_manager.activer_vue_jeu_a_deux_part_1(int(lis[0]), int(lis[1]))                
+            elif lis[0] == "nb:":
+                if int(lis[1])<self._nb_t:
+                    print("veuillez prouver svp!")
+            elif len(lis)>2:
+                print(lis)
+                self._plaques_tirees.clear()
+                self._plaques_tirees = [int(i) for i in lis[0:]]
+                self._vue.vue_manager.activer_vue_jeu_a_deux_part_2(self._plaques_tirees)
+               
+    def compte_a_rebours(self, label,  temps, id):
+        label.config(text = "%d secondes" %temps)
+        if temps > 0:
+             self._vue.vue_manager.section_1._id = label.after(1000, lambda:self.compte_a_rebours (label, temps - 1, self._vue.vue_manager.section_1._id ))
+        else:
+            IvySendMsg(str(self.les_plaques_tirees()))
+            self._vue.vue_manager.section_1.desactiver_btn_stop()
+            self._vue.vue_manager.nombre_trouver()
+            self._vue.vue_manager.btn_nb_trouver()
+            self._vue.vue_manager.section_1.stop_compte_a_rebours()
+            
+    def agent_nb_trouver(self, n):
+        try:
+            self._nb_t = int(n)
+            IvySendMsg("nb:,"+ str(self._nb_t))
+        except:
+            self.lancer_une_alerte("Donnez un nombre SVP !")
+    
+    def on_connection_change(self, agent, event):
+        if len(IvyGetApplicationList()) != 0:
+            self._vue.supp_definir_temps()
+            self._vue.vue_manager.supprimer_vp()
+            
+        if event == IvyApplicationDisconnected:
+            print(f"L'agent {agent} vient de se deconnecter.")
+            
+        if event == IvyApplicationConnected:
+            try:
+                IvySendMsg(str(str(self._temps) +','+ str(self._N)))
+                self._vue.vue_manager.activer_vue_jeu_a_deux_part_1(int(self._temps), self._N)
+            finally:
+                print(f"mise à jour des agents : {IvyGetApplicationList()}")
+            
+    def creat_agent(self, name, readMsg=""):
+        """
+        """
+        IvyInit(name, readMsg, 0, self.on_connection_change, self.on_die)
+        IvyStart()
+        IvyBindMsg(self.get_msg, "(.*)")
+  
     def creer_agent_jeu_a_deux(self, pseudo):
         """
         """
         if self.cree_joueur(pseudo) == None:
             self.lancer_une_alerte("Votre nom doit obligatoirement commencé par une lettre !")
         else:
-            creat_agent(pseudo)     #creation d'agent
+            self.creat_agent(pseudo)     #creation d'agent
             self._vue.cacher_vue_creer_joueur()
+            self._vue.definir_temps()
         
-            if nbAgent == 1:
-                self._vue.vue_jeu_a_deux(msg_sur_bus())
-            else:
-               self._vue.definir_temps()
-            
-            
-    def definir_temps(self, temps):
-        try:
-            v = temps
-            sendMsg(v)
-            self._vue.supp_vue_jeu_a_deux()
-            self._vue.vue_jeu_a_deux(msg_sur_bus())
-        except:
-            self.lancer_une_alerte("Donnez un nombre SVP !")
-         
-        
-    def stop_compte_a_bours(self):
+    def stop_compte_a_rebours(self):
         """
         """
-        pass
+        #IvySendMsg(str(self.les_plaques_tirees()))
+        IvySendMsg("trouver")
+        self._vue.vue_manager.activer_vue_jeu_a_deux_part_2(self._plaques_tirees)
+        self._vue.vue_manager.section_1.stop_compte_a_rebours()
+        self._vue.vue_manager.section_1.desactiver_btn_stop()
     
     def annuller_operation(self):
         """
         """
-        self._vue._vue_entrainement.get_section_2().annuller_derniere_operation()
-        self._vue._vue_entrainement.desactiver_bouton_effectuer()
+        self._vue.vue_manager.section_2.annuller_derniere_operation()
+        self._vue.vue_manager.desactiver_bouton_effectuer()
         
         self._indices.clear()
         self._operandes.clear()
         self._op_select = False
 
     def retourner_accueil(self):
-        self.relance_nouvelle_partie()
-        self._vue.supp_vue_entrainement()
+        self._vue.supprimer_vue_manager()
         #On crée la vue accueil
-        self._vue.vue_accueil()
+        self._vue.activer_vue_accueil()
   
     def lancer_la_vue(self):
         """

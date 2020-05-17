@@ -1,4 +1,4 @@
-from tkinter import Frame, StringVar, Button
+from tkinter import Frame, StringVar, Button, Label
 from vue.Bouton import Bouton
 from datas.donnees_vue import LES_OPERATEURS
 
@@ -6,7 +6,7 @@ class SectionDeux(Frame):
     """
     """
     
-    def __init__(self, master, controller, plaques):
+    def __init__(self, master, controller):
         Frame.__init__(self, master)
         self._controller = controller
         
@@ -15,9 +15,6 @@ class SectionDeux(Frame):
         
         self._liste_textvar = list()
         self._list_btn_desactive = list()
-        
-        self.affiche_les_plaques(plaques)
-        self.affiche_les_operateurs()
     
 
     def affiche_les_plaques(self, plaques):
@@ -130,6 +127,7 @@ class SectionDeux(Frame):
         for i in range(0, len(LES_OPERATEURS)):
             _temp = Bouton(self, LES_OPERATEURS[i], lambda indice = i:self._controller.get_indice_operateur(indice))
             _temp.fixer_des_options(font=("Helvetica", 15), padx=5, pady=3)
-            _temp.grid(row = 2, column = i+1, padx = 3, pady =3)
+            _temp.grid(row = 2, column = i+1, padx = 3, pady = 3)
             self._liste_btn_operateurs.append(_temp)
+            
     
