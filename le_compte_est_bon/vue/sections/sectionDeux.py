@@ -85,11 +85,17 @@ class SectionDeux(Frame):
         """
         self.activer_un_btn(self._list_btn_desactive.pop())
         self.activer_un_btn(self._list_btn_desactive.pop()) 
+
+        last_index = 0
         
         for i in range(0, len(self._liste_textvar)-1):
-            if self._liste_textvar[i].get() !="_" and int(self._liste_textvar[i].get()) == resultat:
-                self._liste_textvar[i].set("_")
-                self.desactiver_un_btn(i)
+            if self._liste_textvar[i].get() != "_" and int(self._liste_textvar[i].get()) == resultat:
+                #On garde dans une variable l'indice du dernier nombre à supprimer
+                last_index = i
+
+        #On le supprime ici
+        self._liste_textvar[last_index].set("_")
+        self.desactiver_un_btn(last_index)
                 
     def desactiver_tous_les_btn(self):
         """

@@ -171,8 +171,11 @@ class Controller:
         self._plaques_tirees.remove(op[-1])
         self._plaques_tirees.append(op[0])
         self._plaques_tirees.append(op[1])
-        self._vue.vue_manager.section_2.mettre_a_jours_les_plaques(op[-1])
         
+        print("on update la plaque : " + str(op[-1]))
+
+        self._vue.vue_manager.section_2.mettre_a_jours_les_plaques(op[-1])
+
         les_element = listbox.get(0, 'end')
         if len(les_element) == 0:
             self._vue.vue_manager.section_3.desactive_btn_supp()
