@@ -137,7 +137,7 @@ class VueManager(Frame):
     
     def nombre_trouver(self):
         self._nb_trouver = StringVar()
-        Label(self, text="Quel nombre qu'avez-vous trouvé ? ", font=("Helvetica", 15)).grid(row = 6, column = 0, padx = 5, pady = 5)
+        Label(self, text="Quel nombre avez-vous trouvé ? ", font=("Helvetica", 15)).grid(row = 6, column = 0, padx = 5, pady = 5)
         self._champ_nb_trouver = Entry(self, textvariable = self._nb_trouver).grid(row = 7, column = 0, padx = 5, pady = 5)
     
     def get_nb_trouver(self):

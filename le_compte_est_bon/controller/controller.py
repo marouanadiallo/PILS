@@ -6,7 +6,7 @@ from vue.vue import Vue
 from modeles.Joueur import Joueur
 from modeles.Plaque import Plaque
 from datas.donnees_vue import INTERVALLE_DE_N
-from modeles.resolution_auto import resolution_automatique
+from modeles.resolution_auto import Resolution
 
 from modeles.operateurDivision import OperateurDivision
 from modeles.operateurFois import OperateurFois
@@ -184,9 +184,9 @@ class Controller:
         self._vue.vue_manager.section_3.vider_solution()
         
         _liste_plaque = [self._N] + self._plaques_tirees
-        _liste_operations = list()
-        min_difference = 1000
-        nombre_plus_proche = 0
+        
+        resolution = Resolution()
+
         max = 6
         #construction de la chaine de responsabilité
         _division = OperateurDivision(None)
@@ -194,12 +194,14 @@ class Controller:
         _moins = OperateurMoins(_fois)
         _plus = OperateurPlus(_moins)
         
-        if not resolution_automatique(_liste_plaque, max,  _plus, _liste_operations, min_difference, nombre_plus_proche) :
+        if not resolution.resolution_automatique(_liste_plaque, max,  _plus) :
+            #Il faut absolument update le nombre le plus proche pour le réutiliser ensuite
+           print("On update le nombre le plus proche : " + str(resolution._nombre_plus_proche))
            _liste_plaque.clear()
-           _liste_plaque = [nombre_plus_proche] + self._plaques_tirees
-           resolution_automatique(_liste_plaque, max,  _plus, _liste_operations, min_difference, nombre_plus_proche)
+           _liste_plaque = [resolution._nombre_plus_proche] + self._plaques_tirees
+           resolution.resolution_automatique(_liste_plaque, max,  _plus)
             
-        for operation in _liste_operations:
+        for operation in resolution._liste_operations:
             self._vue.vue_manager.section_3._listebox_solution.insert('end', operation)
             
     ###################################################################################################################      
@@ -231,6 +233,7 @@ class Controller:
         if args[1] == "trouver":
             self._vue.vue_manager.afficher_aprs_stop()
             self._vue.vue_manager.section_1.desactiver_btn_stop()
+            self._vue.vue_manager.section_1.stop_compte_a_rebours()
         else:
             lis = args[1].replace("]", "").replace("[", "").split(",")
             
@@ -247,11 +250,13 @@ class Controller:
                 self._vue.vue_manager.activer_vue_jeu_a_deux_part_2(self._plaques_tirees)
                
     def compte_a_rebours(self, label,  temps, id):
+        """
+            La méthode compte à rebours
+        """
         label.config(text = "%d secondes" %temps)
         if temps > 0:
              self._vue.vue_manager.section_1._id = label.after(1000, lambda:self.compte_a_rebours (label, temps - 1, self._vue.vue_manager.section_1._id ))
         else:
-            IvySendMsg(str(self.les_plaques_tirees()))
             self._vue.vue_manager.section_1.desactiver_btn_stop()
             self._vue.vue_manager.nombre_trouver()
             self._vue.vue_manager.btn_nb_trouver()
@@ -275,7 +280,9 @@ class Controller:
         if event == IvyApplicationConnected:
             try:
                 IvySendMsg(str(str(self._temps) +','+ str(self._N)))
+                IvySendMsg(str(self.les_plaques_tirees()))
                 self._vue.vue_manager.activer_vue_jeu_a_deux_part_1(int(self._temps), self._N)
+                self._vue.vue_manager.activer_vue_jeu_a_deux_part_2(self._plaques_tirees)
             finally:
                 print(f"mise à jour des agents : {IvyGetApplicationList()}")
             
@@ -301,7 +308,6 @@ class Controller:
         """
         #IvySendMsg(str(self.les_plaques_tirees()))
         IvySendMsg("trouver")
-        self._vue.vue_manager.activer_vue_jeu_a_deux_part_2(self._plaques_tirees)
         self._vue.vue_manager.section_1.stop_compte_a_rebours()
         self._vue.vue_manager.section_1.desactiver_btn_stop()
     
